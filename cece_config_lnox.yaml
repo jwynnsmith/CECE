@@ -1,0 +1,66 @@
+driver:
+  start_time: "2024-07-15T18:00:00"
+  end_time: "2024-07-15T19:00:00"
+  timestep_seconds: 3600
+  log_file: "cece.log"
+  grid:
+    nx: 256
+    ny: 128
+    lon_min: 260.0
+    lon_max: 290.0
+    lat_min: 20.0
+    lat_max: 35.0
+
+meteorology: {}
+
+temporal_profiles: {}
+
+species:
+  lightning_nox:
+    - name: "lightning_nox"       # Matches the requested output variable name exactly
+      field: "GFS_CLD_AMT"
+      operation: "add"
+      scale: 1.0
+
+cece_data:
+  streams:
+    - name: "GFS_ATM_STREAM"
+      file: "/gpfs/f6/bil-fire3/scratch/Jonathan.Smith/cece/GFS_DATA/gfs_sub_atmf006.nc"
+      yearFirst: 2024
+      yearLast: 2024
+      yearAlign: 2024
+      taxmode: "cycle"
+      tintalgo: "exact"
+      mapalgo: "none"
+      data_model: "classic"
+      variables:
+        - file: "cld_amt"
+          model: "GFS_CLD_AMT"
+
+    - name: "GFS_SFC_STREAM"
+      file: "/gpfs/f6/bil-fire3/scratch/Jonathan.Smith/cece/GFS_DATA/gfs_sub_sfcf006.nc"
+      yearFirst: 2024
+      yearLast: 2024
+      yearAlign: 2024
+      taxmode: "cycle"
+      tintalgo: "exact"
+      mapalgo: "none"
+      data_model: "classic"
+      variables:
+        - file: "land"
+          model: "GFS_LAND"
+
+diagnostics:
+  output_interval_seconds: 3600
+  variables: ["lightning_nox"]
+
+output:
+  enabled: true
+  directory: "./cece_output"
+  filename_pattern: "cece_m1_{YYYY}{MM}{DD}_{HH}{mm}{ss}.nc"
+  frequency_steps: 1
+  fields:
+    - name: "lightning_nox"
+      attributes:
+        units: "moles m-2 s-1"
+        long_name: "lightning_nox_emission_flux"
